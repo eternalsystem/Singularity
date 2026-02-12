@@ -1,124 +1,126 @@
 # Singularity
 
-Singularity est un outil d'analyse de logiciels malveillants et de rétro‑ingénierie écrit en Rust. Il fournit une interface GUI rapide et une CLI pour analyser des fichiers binaires, des paquets JavaScript/Node.js et des charges Python obfusquées, avec extraction de contenus, désassemblage et détection de secrets.
+![Singularity](./Singularity-git.png)
 
-## Vue d’ensemble
-- **Double mode GUI/CLI** : interface graphique eframe/egui et analyse en ligne de commande.
-- **Analyse multi‑formats** : PE/ELF, scripts, archives et conteneurs.
-- **Extraction et déobfuscation** : PyInstaller, PyArmor, JS obfusqué, fichiers embarqués.
-- **Détection avancée** : YARA (Boreal), secrets, URLs, heuristiques et couche par couche.
-- **Outils intégrés** : décodeurs, stéganographie, scanner en ligne, rapport webhook.
+Singularity is a malware analysis and reverse‑engineering tool written in Rust. It provides a fast GUI and a CLI to analyze binaries, JavaScript/Node.js packages, and obfuscated Python payloads, with content extraction, disassembly, and secret detection.
 
-## Architecture (haute‑niveau)
-- **Point d’entrée** : `src/main.rs` choisit le mode CLI si un chemin est fourni, sinon démarre la GUI.
-- **Interface** : `src/app.rs` gère l’état, les onglets, le viewer de code, l’envoi de rapport et le consentement YARA.
-- **Moteur d’analyse** : `src/analysis.rs` orchestre la détection de type, la sélection d’analyseur et l’agrégation des résultats.
-- **Analyse en couches** : `src/layered_analysis.rs` construit un rapport par couches avec guide d’investigation.
-- **YARA** : `src/signature_engine.rs` + `src/update_rules.rs` chargent et mettent à jour les règles (yara‑forge).
-- **Outils externes** : `src/tools_manager.rs` installe Node.js, Synchrony/deobfuscator et asar via npm, et PyArmor OneShot.
-- **Services** : `src/online_scanner.rs` intègre OPSWAT MetaDefender Cloud.
-- **Modules malware** : `src/malware/*` et `src/heuristic_decryptor.rs` gèrent la déobfuscation et l’extraction de configs.
+## Overview
+- **Dual GUI/CLI**: eframe/egui interface and command‑line analysis.
+- **Multi‑format analysis**: PE/ELF, scripts, archives, and containers.
+- **Extraction and deobfuscation**: PyInstaller, PyArmor, obfuscated JS, embedded files.
+- **Advanced detection**: YARA (Boreal), secrets, URLs, heuristics, and layered analysis.
+- **Built‑in tools**: decoders, steganography, online scanner, webhook report.
 
-## Flux d’analyse (résumé)
-1. **Détection du type** (format, langage, heuristiques de conteneur).
-2. **Sélection d’un analyseur** (PyArmor, PyInstaller, PYC, binaire, texte, Lua, inconnu).
-3. **Extraction des contenus** (archives internes, snapshots, sections, strings).
-4. **Déobfuscation** (Synchrony pour JS, PyArmor OneShot, routines spécifiques malware).
-5. **Désassemblage** et **collecte des imports/sections**.
-6. **Détection YARA** si les règles sont installées.
-7. **Scan de secrets/URLs** sur les sorties.
-8. **Rapport en couches** avec instructions de suivi.
+## Architecture (high‑level)
+- **Entry point**: `src/main.rs` selects CLI mode if a path is provided, otherwise starts the GUI.
+- **Interface**: `src/app.rs` manages state, tabs, the code viewer, report sending, and YARA consent.
+- **Analysis engine**: `src/analysis.rs` orchestrates type detection, analyzer selection, and result aggregation.
+- **Layered analysis**: `src/layered_analysis.rs` builds a layered report with investigation guidance.
+- **YARA**: `src/signature_engine.rs` + `src/update_rules.rs` load and update rules (yara‑forge).
+- **External tools**: `src/tools_manager.rs` installs Node.js, Synchrony/deobfuscator and asar via npm, and PyArmor OneShot.
+- **Services**: `src/online_scanner.rs` integrates OPSWAT MetaDefender Cloud.
+- **Malware modules**: `src/malware/*` and `src/heuristic_decryptor.rs` handle deobfuscation and config extraction.
 
-## Fonctionnalités détaillées
+## Analysis flow (summary)
+1. **Type detection** (format, language, container heuristics).
+2. **Analyzer selection** (PyArmor, PyInstaller, PYC, binary, text, Lua, unknown).
+3. **Content extraction** (internal archives, snapshots, sections, strings).
+4. **Deobfuscation** (Synchrony for JS, PyArmor OneShot, malware‑specific routines).
+5. **Disassembly** and **imports/sections collection**.
+6. **YARA detection** if rules are installed.
+7. **Secrets/URLs scan** on outputs.
+8. **Layered report** with follow‑up guidance.
 
-### 🔍 Analyse statique avancée
-- **Binaire** : parsing via Goblin, sections, imports, strings.
-- **Désassemblage** : Capstone avec listing lisible.
-- **Secrets & URLs** : regex + heuristiques (Base64, tokens inversés).
-- **YARA** : scan des octets et chargement automatique de règles.
+## Detailed features
+
+### 🔍 Advanced static analysis
+- **Binary**: parsing via Goblin, sections, imports, strings.
+- **Disassembly**: Capstone with readable listing.
+- **Secrets & URLs**: regex + heuristics (Base64, reversed tokens).
+- **YARA**: byte scanning and automatic rule loading.
 
 ### 📦 JavaScript / Node.js
-- **ASAR** : extraction des archives Electron.
-- **PKG snapshot** : reconstruction et listing des fichiers JS.
-- **Déobfuscation** : Synchrony/deobfuscator via npm.
-- **Sandbox** : exécution isolée via Boa.
-- **Viewer** : affichage du code original/déobfusqué avec recherche.
+- **ASAR**: extraction of Electron archives.
+- **PKG snapshot**: reconstruction and listing of JS files.
+- **Deobfuscation**: Synchrony/deobfuscator via npm.
+- **Sandbox**: isolated execution via Boa.
+- **Viewer**: display of original/deobfuscated code with search.
 
 ### 🧪 Python & stealer
-- **PyInstaller** : extraction du TOC, reconstruction de PYC et désassemblage.
-- **PyArmor OneShot** : support d’extraction automatisée.
-- **Déchiffrement heuristique** : clés/IV détectées dans le code/disassembly.
-- **Modules stealer** : déobfuscation et extraction de configuration.
+- **PyInstaller**: TOC extraction, PYC reconstruction, and disassembly.
+- **PyArmor OneShot**: automated extraction support.
+- **Heuristic decryption**: keys/IVs detected in code/disassembly.
+- **Stealer modules**: deobfuscation and configuration extraction.
 
-### 🧰 Outils complémentaires
-- **Décodeur de chaînes** : Base64, Hex, Rot13, Reverse, URL, Binaire.
-- **Stéganographie** : LSB, métadonnées et intégration Aperi'Solve.
-- **Décrypteur de liens** : mode manuel dans le viewer.
-- **Rapport** : envoi par webhook avec embeds et suppression possible.
+### 🧰 Complementary tools
+- **String decoder**: Base64, Hex, Rot13, Reverse, URL, Binary.
+- **Steganography**: LSB, metadata, and Aperi'Solve integration.
+- **Link decryptor**: manual mode in the viewer.
+- **Report**: webhook sending with embeds and optional deletion.
 
-### ☁️ Scanner en ligne
-- **MetaDefender Cloud (OPSWAT)** : 30+ moteurs AV via API.
-- **Optimisation** : tentative de résolution par hash avant upload.
+### ☁️ Online scanner
+- **MetaDefender Cloud (OPSWAT)**: 30+ AV engines via API.
+- **Optimization**: hash resolution attempt before upload.
 
-## Interface GUI (onglets)
-- **Info** : format, langage, score et méta.
-- **URLs** : extraction centralisée.
-- **Imports / Sections** : vue binaire.
-- **Strings / Disassembly** : recherche texte intégrée.
-- **Secrets** : tokens et clés détectés.
-- **Extracted** : fichiers, code original/déobfusqué, sandbox JS.
-- **Layered Analysis** : rapport multi‑couches et guide.
-- **Send Report** : webhook + embeds + image.
-- **Online Scan** : MetaDefender Cloud.
+## GUI interface (tabs)
+- **Info**: format, language, score, and metadata.
+- **URLs**: centralized extraction.
+- **Imports / Sections**: binary view.
+- **Strings / Disassembly**: integrated text search.
+- **Secrets**: detected tokens and keys.
+- **Extracted**: files, original/deobfuscated code, JS sandbox.
+- **Layered Analysis**: multi‑layer report and guide.
+- **Send Report**: webhook + embeds + image.
+- **Online Scan**: MetaDefender Cloud.
 
-## Stockage local
-- **Outils** : `%APPDATA%\Singularity\tools` (Windows).
-- **Extraits** : `%APPDATA%\Singularity\extracted`.
-- **Règles YARA** : `%APPDATA%\Singularity\signatures`.
-- **Config** : `%APPDATA%\Singularity\config.json`.
-- **Fallback** : si APPDATA/LOCALAPPDATA indisponible, le dossier temporaire est utilisé.
+## Local storage
+- **Tools**: `%APPDATA%\Singularity\tools` (Windows).
+- **Extracts**: `%APPDATA%\Singularity\extracted`.
+- **YARA rules**: `%APPDATA%\Singularity\signatures`.
+- **Config**: `%APPDATA%\Singularity\config.json`.
+- **Fallback**: if APPDATA/LOCALAPPDATA is unavailable, the temp directory is used.
 
 ## Installation
 
-### Prérequis
-- Rust (dernière version stable)
-- Dépendances système pour `eframe`/`wgpu` (généralement installées par défaut sur Windows/macOS, paquets `libgtk-3-dev` etc. sur Linux).
+### Prerequisites
+- Rust (latest stable)
+- System dependencies for `eframe`/`wgpu` (typically installed by default on Windows/macOS, `libgtk-3-dev` etc. on Linux).
 
-### Compilation
+### Build
 ```bash
-git clone https://github.com/votre-username/singularity.git
+git clone https://github.com/your-username/singularity.git
 cd singularity
 cargo run --release
 ```
 
-### Installation d’outils externes
-Lors du premier lancement, Singularity peut installer automatiquement :
-- Node.js (portable) pour Synchrony/deobfuscator et asar.
-- PyArmor OneShot et ses dépendances.
-- Règles YARA via yara‑forge (sur consentement explicite).
+### External tools installation
+On first launch, Singularity can automatically install:
+- Node.js (portable) for Synchrony/deobfuscator and asar.
+- PyArmor OneShot and its dependencies.
+- YARA rules via yara‑forge (with explicit consent).
 
-## Utilisation
+## Usage
 
-### Mode GUI
+### GUI mode
 ```bash
 cargo run --release
 ```
-Glissez‑déposez un fichier dans la fenêtre ou utilisez le menu pour ouvrir un fichier à analyser.
+Drag and drop a file into the window or use the menu to open a file to analyze.
 
-### Mode CLI
+### CLI mode
 ```bash
-cargo run --release -- <chemin_du_fichier>
+cargo run --release -- <path_to_file>
 ```
-La CLI affiche un suivi de progression, les résultats de base et le rapport en couches.
+The CLI shows progress tracking, basic results, and the layered report.
 
 ## Technologies
-- **Langage** : Rust 🦀
-- **GUI** : eframe / egui
-- **Parsing binaire** : Goblin
-- **Désassemblage** : Capstone
-- **Moteur JS** : Boa
-- **Matching de signatures** : Boreal (YARA)
-- **HTTP** : reqwest
+- **Language**: Rust 🦀
+- **GUI**: eframe / egui
+- **Binary parsing**: Goblin
+- **Disassembly**: Capstone
+- **JS engine**: Boa
+- **Signature matching**: Boreal (YARA)
+- **HTTP**: reqwest
 
-## Avertissement
-Cet outil est destiné à des fins éducatives et de recherche en sécurité. L’analyse de logiciels malveillants doit être effectuée dans un environnement isolé et sécurisé (machine virtuelle, sandbox). L’auteur n’est pas responsable de l’utilisation abusive de cet outil.
+## Disclaimer
+This tool is intended for educational and security research purposes. Malware analysis must be performed in an isolated and secure environment (virtual machine, sandbox). The author is not responsible for misuse of this tool.
