@@ -1,0 +1,46 @@
+[package]
+name = "Singularity"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1"
+capstone = "0.12"
+eframe = { version = "0.27", features = ["wgpu", "default_fonts", "wayland", "x11", "android-native-activity"] }
+wgpu = { version = "0.19" }
+windows = { version = "0.48", features = ["Win32_UI_WindowsAndMessaging", "Win32_Foundation", "Win32_System_Console"] }
+flate2 = "1"
+goblin = "0.8"
+reqwest = { version = "0.11", features = ["blocking", "multipart", "json"] }
+rfd = "0.12"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1.0"
+zip = "0.6"
+regex = "1.10"
+walkdir = "2.3"
+image = "0.24"
+arboard = "3.2"
+base64 = "0.21"
+urlencoding = "2"
+kamadak-exif = "0.5"
+lzma-rs = "0.3.0"
+lazy_static = "1.4"
+aes-gcm = "0.10.3"
+chrono = "0.4"
+aes = "0.8"
+ctr = "0.9"
+md5 = "0.7"
+boa_engine = "0.21.0"
+boa_gc = "0.21.0"
+pbkdf2 = "0.12.2"
+sha2 = "0.10.9"
+hmac = "0.12.1"
+cbc = "0.1.2"
+hex = "0.4.3"
+boreal = { version = "0.4", features = ["hash", "object", "memmap"] }
+tokio = { version = "1", features = ["rt", "macros", "time"] }
+
+[build-dependencies]
+winres = "0.1"
+anyhow = "1"
+reqwest = { version = "0.13.1", features = ["blocking"] }
