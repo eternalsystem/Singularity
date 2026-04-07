@@ -28,7 +28,7 @@ pub struct PyInstallerExtractedEntry {
     pub type_code: u8,
 }
 
-pub const PYINSTALLER_MAX_DECOMPRESSED_ENTRY_BYTES: usize = 64 * 1024 * 1024;
+pub const PYINSTALLER_MAX_DECOMPRESSED_ENTRY_BYTES: usize = 512 * 1024 * 1024; // 512 MB
 pub const PYINSTALLER_MAX_ENCRYPTED_STORED_BYTES: usize = 64 * 1024;
 
 fn looks_like_pyc(bytes: &[u8]) -> bool {
